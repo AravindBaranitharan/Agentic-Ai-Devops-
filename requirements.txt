@@ -1,0 +1,15 @@
+# ── AI Agents for Cloud & DevOps — shared dependencies ──
+# Install once for all day folders:  pip install -r requirements.txt
+# (recommended: use a virtualenv or `uv venv`)
+
+# Core — used across most days
+openai>=1.30               # OpenAI SDK (Chat Completions, tool calling) — gpt-4o
+pydantic>=2.6              # typed/validated structured I/O & tool schemas
+python-dotenv>=1.0         # load OPENAI_API_KEY from .env
+httpx>=0.27               # async HTTP for calling cloud/monitoring APIs
+numpy>=1.26               # vectors / cosine similarity (embeddings, RAG demos)
+tenacity>=8.2             # retries with exponential backoff (resilient calls)
+tiktoken>=0.7            # tokenizer for the Day 1 tokenization demo (gpt-4o)
+
+# Optional — uncomment as needed
+# boto3>=1.34             # if you also want an AWS example
