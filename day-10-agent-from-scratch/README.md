@@ -12,14 +12,18 @@ is just ergonomics on top of the same loop.
 | `tools.py` | Step 1 — two mocked DevOps tools (`get_pods`, `get_pod_logs`) + their JSON schemas, the `TOOLS` list, and the `REGISTRY` (name → function). |
 | `agent.py` | Steps 2–5 — dispatch, memory, the agent loop, and secrets. Runnable live or offline. |
 | `sample_session.md` | A full reference transcript to show in class. |
+| `requirements.txt` | Everything to `pip install` — this folder is fully self-contained. |
+| `env.sample` | Rename to `.env` and paste your `OPENAI_API_KEY` for a LIVE run. |
 
-## Run it
+## Run it (everything happens inside THIS folder)
 
 ```bash
-cd code
-pip install -r requirements.txt        # one-time
-cp .env.example .env                    # paste OPENAI_API_KEY for a LIVE run (optional)
 cd day-10-agent-from-scratch
+
+python -m venv .venv && source .venv/bin/activate   # recommended (Windows: .venv\Scripts\activate)
+pip install -r requirements.txt                     # one-time
+
+cp env.sample .env      # ← rename, then open .env and paste your OPENAI_API_KEY (optional)
 python agent.py
 ```
 

@@ -1,25 +1,28 @@
 # Agentic AI for DevOps
 
-Hands-on code from the **AI Agents for Cloud & DevOps** course — prepared by Aravind Baranitharan.
+Hands-on labs from the **AI Agents for Cloud & DevOps** course — prepared by Aravind Baranitharan.
 
-## Day 10 — Build a Tool-Using Agent From Scratch
+**Each day is one self-contained folder.** Everything you need for a lab — code, docs,
+`requirements.txt`, and an `env.sample` — lives inside that day's folder. New folders are
+pushed as the course progresses.
 
-A working, tool-using AI agent in plain Python — no framework. The agent diagnoses a
-(mocked) Kubernetes namespace by choosing and chaining tools (`get_pods`, `get_pod_logs`)
-through the OpenAI **gpt-4o** tool-calling loop.
+## Labs
 
-**[→ day-10-agent-from-scratch/](day-10-agent-from-scratch/)** — code + full README (what it does, how to run, expected output).
+| Day | Folder | What you build |
+|-----|--------|----------------|
+| 10 | [`day-10-agent-from-scratch/`](day-10-agent-from-scratch/) | A tool-using AI agent in plain Python — no framework. OpenAI **gpt-4o** tool-calling loop over mocked Kubernetes tools. |
 
-## Quick start
+## How every lab works
 
 ```bash
+cd day-XX-...                       # enter the day's folder
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-cp .env.example .env          # paste your OPENAI_API_KEY (optional)
-
-cd day-10-agent-from-scratch
-python agent.py               # runs OFFLINE with scripted data if no key is set
+cp env.sample .env                  # rename, then paste your OPENAI_API_KEY inside
+python <main script>.py
 ```
 
-- **No API key?** The demo still runs end-to-end with deterministic mock data.
-- **With `OPENAI_API_KEY`** the same loop is driven live by gpt-4o; the cluster tools stay mocked, so nothing real is touched.
+- **No API key?** Every lab still runs end-to-end in OFFLINE mode with deterministic mock data.
+- **With your `OPENAI_API_KEY`** the same code runs LIVE on gpt-4o — the DevOps tools stay
+  mocked, so nothing real (cluster/cloud/CI) is ever touched.
+- Never commit your real `.env` — it is git-ignored.

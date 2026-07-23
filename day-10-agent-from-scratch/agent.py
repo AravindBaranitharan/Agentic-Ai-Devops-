@@ -8,7 +8,7 @@ This is the whole agent architecture from Hours 5–6, in plain Python:
 Run it:
     python agent.py
 
-  • With OPENAI_API_KEY set (in code/.env)  → LIVE mode: real gpt-4o drives the loop.
+  • With OPENAI_API_KEY set (rename env.sample → .env in this folder)  → LIVE mode: real gpt-4o drives the loop.
   • Without a key                           → OFFLINE mode: a scripted "model" walks
                                               the EXACT same loop with canned decisions,
                                               so you can demo the mechanics anywhere.
@@ -22,11 +22,14 @@ from pathlib import Path
 
 from tools import TOOLS, REGISTRY  # Step 1 (tools) + the name→fn registry
 
-# ── Step 5 · Secrets/config: load .env from this folder AND the shared code/.env ──
+# ── Step 5 · Secrets/config: load the key from THIS folder ─────────────────
+# Students: rename `env.sample` → `.env` (or just `env`) and paste your key.
+# Both names are accepted below, so either rename works.
 try:
     from dotenv import load_dotenv
-    load_dotenv()  # ./.env if present
-    load_dotenv(Path(__file__).resolve().parent.parent / ".env")  # code/.env
+    _here = Path(__file__).resolve().parent
+    load_dotenv(_here / ".env")   # preferred name
+    load_dotenv(_here / "env")    # also accepted
 except ImportError:
     pass  # python-dotenv optional; env vars may already be exported
 
@@ -169,7 +172,7 @@ def main():
         create = live_create()
     else:
         print("● OFFLINE mode — no OPENAI_API_KEY found, using a scripted model.")
-        print("  (Set OPENAI_API_KEY in code/.env for a real run.)\n")
+        print("  (Rename env.sample → .env and paste your OPENAI_API_KEY for a real run.)\n")
         create = scripted_create()
 
     run_agent(task, create)
