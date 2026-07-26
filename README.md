@@ -12,6 +12,12 @@ pushed as the course progresses.
 |-----|--------|----------------|
 | 10 | [`day-10-agent-from-scratch/`](day-10-agent-from-scratch/) | A tool-using AI agent in plain Python — no framework. OpenAI **gpt-4o** tool-calling loop over mocked Kubernetes tools. |
 
+## Projects
+
+| Project | Folder | What it is |
+|---------|--------|------------|
+| AWS ChatOps Agent | [`aws-chatops-agent/`](aws-chatops-agent/) | A real-world **agentic AI** demo: operate AWS (EC2 · S3 · CloudWatch) from a **Streamlit** chat box. gpt-4o + `boto3` tools + a human **approval gate** on every state change. Runs on mock data or live AWS. Includes the project presentation (PDF). |
+
 ## How every lab works
 
 ```bash
