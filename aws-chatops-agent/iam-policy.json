@@ -7,6 +7,8 @@
       "Action": [
         "ec2:DescribeInstances",
         "s3:ListAllMyBuckets",
+        "s3:ListBucket",
+        "s3:GetBucketLocation",
         "s3:GetBucketPublicAccessBlock",
         "s3:GetBucketPolicyStatus",
         "cloudwatch:DescribeAlarms"

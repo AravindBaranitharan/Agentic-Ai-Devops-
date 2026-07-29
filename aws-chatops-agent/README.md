@@ -24,7 +24,9 @@ tools + a **human approval gate**.
 |------|------------|
 | `aws_tools.py` | The AWS tools (EC2 / S3 / CloudWatch) — each works in **mock** or **real boto3** mode. Also exports the OpenAI tool schemas (`TOOLS`), the `REGISTRY`, and the `RISK` map (read-only vs destructive). |
 | `agent.py` | The gpt-4o tool-calling brain (`call_model`) + an **offline fallback** brain so it runs with no key. UI-agnostic. |
-| `app.py` | The **Streamlit** chat UI: renders the conversation + tool calls, runs the loop, and shows the **Approve / Deny** gate. Keeps an audit log. |
+| `app.py` | The **Streamlit** chat UI: renders the conversation + tool calls (streamed with a typing effect), runs the loop, and shows the **Approve / Deny** gate. Keeps an audit log. |
+| `s3_status.py` | **S3 freshness audit, built with LangChain.** A `@tool` (`check_s3_freshness`) + a LangChain 1.x `create_agent` (gpt-4o). A bucket **PASSES** if any object was modified within N days (default 30), else **FAILS** (stale). |
+| `pages/1_S3_Status.py` | A **second Streamlit page**: a PASS/FAIL freshness table + a LangChain "ask" box. Reachable from the sidebar page nav. |
 | `requirements.txt` | Everything to install. |
 | `env.sample` | Rename to `.env` and paste your `OPENAI_API_KEY`. |
 
@@ -38,7 +40,7 @@ pip install -r requirements.txt
 cp env.sample .env        # then open .env and paste your OPENAI_API_KEY
 ```
 
-Packages installed: `streamlit`, `openai`, `boto3`, `python-dotenv`.
+Packages installed: `streamlit`, `openai`, `boto3`, `python-dotenv`, `langchain` (1.x), `langchain-openai`.
 
 ## 4. How to run
 
