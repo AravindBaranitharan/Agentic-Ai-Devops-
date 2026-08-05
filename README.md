@@ -17,6 +17,7 @@ pushed as the course progresses.
 | Project | Folder | What it is |
 |---------|--------|------------|
 | AWS ChatOps Agent | [`aws-chatops-agent/`](aws-chatops-agent/) | A real-world **agentic AI** demo: operate AWS (EC2 · S3 · CloudWatch) from a **Streamlit** chat box. gpt-4o + `boto3` tools + a human **approval gate** on every state change. Runs on mock data or live AWS. Includes the project presentation (PDF). |
+| Chat-FinOps Agent | [`chat-finops-agent/`](chat-finops-agent/) | An AI **FinOps** agent: analyze AWS cost, explain month-over-month changes, and surface waste (idle EC2, unused EBS/EIP, old snapshots, stale S3) with **$/mo savings** — a Streamlit dashboard + a **LangChain** (gpt-4o) chat. Read-only; hybrid live/mock. |
 
 ## How every lab works
 
