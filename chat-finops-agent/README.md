@@ -2,8 +2,8 @@
 
 An AI **FinOps** agent that analyzes AWS cost, explains changes, and surfaces waste with
 **dollar-value savings** — all read-only. Ask questions in plain English; get a live dashboard
-and a LangChain + gpt-4o chat. (This build covers Phases 1–3: insight + savings. Approval &
-guarded execution are the next phases.)
+and a LangChain + gpt-4o chat — plus a **manager approval portal** (ticket → notify → approve →
+guarded execution). Covers Phases 1–5: insight, savings, approval, and guarded action.
 
 ## What it does
 1. **Cost visibility** — month-end forecast vs budget, 6-month trend, spend per account.
@@ -16,8 +16,11 @@ guarded execution are the next phases.)
 |------|------------|
 | `finops_tools.py` | Cost (real Cost Explorer → mock fallback) + optimization detectors (live boto3, read-only) + savings math. |
 | `finops_agent.py` | LangChain 1.x `create_agent` (gpt-4o) exposing the tools as `@tool`s. |
-| `app.py` | Streamlit **dashboard** — visibility, analytics, and the savings scan. |
+| `app.py` | Streamlit **dashboard** — visibility, analytics, savings scan, and "raise approval request". |
 | `pages/1_Chat.py` | Streamlit **chat** page — ask the LangChain FinOps agent. |
+| `pages/2_Approvals.py` | **Manager approval portal** — pending tickets, notification, approve/reject, audit. |
+| `approvals.py` | Ticket store + **guarded execution** (dry-run default; real action only when enabled). |
+| `presentation.html` · `Chat-FinOps-Presentation.pdf` | Stakeholder deck (self-contained). |
 | `iam-policy.json` | Least-privilege **read-only** IAM policy. |
 | `env.sample` | Rename to `.env`, paste your keys. |
 

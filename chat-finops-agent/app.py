@@ -18,6 +18,7 @@ from dotenv import load_dotenv
 load_dotenv(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env"))
 
 import finops_tools as F
+import approvals
 
 st.set_page_config(page_title="Chat-FinOps Agent", page_icon="💰", layout="wide")
 ss = st.session_state
@@ -91,8 +92,24 @@ if st.button("🔍 Scan for savings", type="primary") or "finops_rep" in ss:
     if rows:
         st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
         st.success(f"Found ${rep['total_monthly_savings']:,.2f}/mo of potential savings "
-                   f"(~${rep['annual_savings']:,.0f}/yr). Actions require business-owner approval "
-                   "(next phase).")
+                   f"(~${rep['annual_savings']:,.0f}/yr).")
+
+        st.subheader("Raise approval requests")
+        st.caption("Send a finding to the manager portal as a ticket — no action runs until it's approved.")
+        for it in [i for i in rep["items"] if i.get("monthly_savings")]:
+            c1, c2 = st.columns([5, 1])
+            c1.markdown(f"**{it['category']}** · `{it['resource']}` — ${it['monthly_savings']:.2f}/mo")
+            if approvals.already_requested(it["resource"]):
+                c2.caption("✔ requested")
+            elif c2.button("Request", key=f"req_{it['resource']}"):
+                approvals.create_ticket(it, requested_by="engineer")
+                st.toast(f"Request raised for {it['resource']} → Manager portal")
+                st.rerun()
+
+        n = approvals.pending_count()
+        if n:
+            st.info(f"🔔 **{n} request(s) pending** in the Manager **Approvals** portal "
+                    "(open it from the sidebar).")
     else:
         st.info("No clear waste found by the current detectors. 🎉")
 else:
