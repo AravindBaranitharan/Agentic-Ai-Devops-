@@ -1,0 +1,6 @@
+# LangChain & LangGraph demo — dependencies
+langchain>=1.0          # LangChain core + agents (create_agent)
+langchain-openai>=0.2   # ChatOpenAI (gpt-4o)
+langgraph>=0.2          # StateGraph, tools loop, checkpointer, interrupts
+python-dotenv>=1.0      # loads OPENAI_API_KEY from .env
+pydantic>=2.6           # structured output
