@@ -1,0 +1,12 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    { "Sid": "PlanIdentity", "Effect": "Allow",
+      "Action": ["sts:GetCallerIdentity"], "Resource": "*" },
+    { "Sid": "ApplyS3Example", "Effect": "Allow",
+      "Action": [
+        "s3:CreateBucket", "s3:PutBucketVersioning", "s3:PutEncryptionConfiguration",
+        "s3:PutBucketPublicAccessBlock", "s3:GetBucket*", "s3:ListBucket", "s3:DeleteBucket"
+      ], "Resource": "*" }
+  ]
+}

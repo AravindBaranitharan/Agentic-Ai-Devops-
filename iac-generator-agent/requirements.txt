@@ -1,0 +1,6 @@
+# IaC Generator Agent — dependencies
+streamlit==1.60.0      # UI (pin: 1.61 + starlette 1.4 broke gzip)
+starlette<1.4          # keep gzip compatible with streamlit 1.60
+openai>=1.30           # gpt-4o (HCL generation + plan explanation)
+python-dotenv>=1.0     # loads keys from .env
+# terraform CLI is a system tool (brew install terraform) — not a pip package

@@ -19,6 +19,7 @@ pushed as the course progresses.
 | AWS ChatOps Agent | [`aws-chatops-agent/`](aws-chatops-agent/) | A real-world **agentic AI** demo: operate AWS (EC2 · S3 · CloudWatch) from a **Streamlit** chat box. gpt-4o + `boto3` tools + a human **approval gate** on every state change. Runs on mock data or live AWS. Includes the project presentation (PDF). |
 | Chat-FinOps Agent | [`chat-finops-agent/`](chat-finops-agent/) | An AI **FinOps** agent: analyze AWS cost, explain month-over-month changes, and surface waste (idle EC2, unused EBS/EIP, old snapshots, stale S3) with **$/mo savings** — a Streamlit dashboard + a **LangChain** (gpt-4o) chat. Read-only; hybrid live/mock. |
 | LangChain & LangGraph demo | [`langchain-langgraph-demo/`](langchain-langgraph-demo/) | Teaching material for two sessions: runnable **LangChain** (LCEL, tools/agent, structured output) and **LangGraph** (state graph, agent loop, human-in-the-loop) examples, plus two interactive decks (What-is-LangChain / What-is-LangGraph, PDF) and a comparison. |
+| IaC Generator Agent | [`iac-generator-agent/`](iac-generator-agent/) | Natural language → reviewed **Terraform**: gpt-4o generates secure HCL, runs a real `terraform plan`, explains the diff, checks policy, and gates `apply` behind human approval. Streamlit app + 3-slide deck (PDF). |
 
 ## How every lab works
 
