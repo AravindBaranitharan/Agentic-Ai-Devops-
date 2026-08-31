@@ -88,19 +88,19 @@ body{background:#05080f;font-family:var(--sans);color:var(--fg);-webkit-font-smo
   <!-- 2 · SOLUTION -->
   <section class="slide">
     <div class="head"><div class="kicker">02 · Proposed solution</div>
-      <h2 class="h2">An agent that <span class="am">diagnoses</span> — and asks before it acts</h2></div>
+      <h2 class="h2">A <span class="am">LangGraph agent</span> that diagnoses — and asks before it acts</h2></div>
     <div class="body">
-      <p class="lead">A <b>Kubernetes Troubleshooting Agent</b>: point it at a namespace, it finds the broken pods,
-        reads their status + events + logs, and gpt-4o returns the <em class="em">real root cause</em> with the evidence —
-        then proposes one fix and waits for a human to approve it.</p>
+      <p class="lead">A <b>Kubernetes Troubleshooting Agent</b> built as a <b>LangGraph</b> state machine: point it
+        at a namespace, it <em class="em">investigates</em> a broken pod live — calling read-only tools in a ReAct loop —
+        then gpt-4o returns the real root cause with the evidence, and it waits for a human to approve any fix.</p>
       <div class="grid4 mt2">
-        <div class="card"><div class="num">01</div><div class="h3">See</div><p>Read-only: pods, container states, events, log tails.</p></div>
-        <div class="card"><div class="num">02</div><div class="h3">Diagnose</div><p>gpt-4o names the failure, cites the evidence line, explains why.</p></div>
-        <div class="card"><div class="num">03</div><div class="h3">Propose</div><p>One safe fix — restart / scale / delete-pod — or "manual".</p></div>
-        <div class="card hot"><div class="num">04</div><div class="h3">Gate</div><p>Human approves; dry-run by default before anything runs.</p></div>
+        <div class="card"><div class="num">01</div><div class="h3">Investigate</div><p>ReAct loop: the agent calls <span class="mono">describe</span> / <span class="mono">logs</span> tools itself.</p></div>
+        <div class="card"><div class="num">02</div><div class="h3">Diagnose</div><p>Structured output — failure class, evidence line, root cause, fix.</p></div>
+        <div class="card"><div class="num">03</div><div class="h3">Propose</div><p>One safe action — restart / scale / delete-pod — or "manual".</p></div>
+        <div class="card hot"><div class="num">04</div><div class="h3">Gate</div><p>Graph pauses at <span class="mono">interrupt()</span> for human approval.</p></div>
       </div>
-      <div class="callout mt2"><b>The agent proposes; a human disposes.</b> The LLM only reads and reasons —
-        the one place that can change a cluster is a tiny, safe allow-list behind an explicit approval.</div>
+      <div class="callout mt2"><b>The agent proposes; a human disposes.</b> Real <em class="em">live cases</em> on a real cluster —
+        no canned data. The LLM only reads and reasons; the one mutating step is a tiny allow-list behind an explicit approval.</div>
     </div>
     <footer class="sb"><span><span class="g">◆</span> k8s-troubleshooting-agent</span><span class="c">Solution</span><span>02 / 03</span><span class="prog" style="width:66.6%"></span></footer>
   </section>
@@ -111,23 +111,23 @@ body{background:#05080f;font-family:var(--sans);color:var(--fg);-webkit-font-smo
       <h2 class="h2">The <span class="am">process</span>, end to end</h2></div>
     <div class="body">
       <div class="flow">
-        <div class="node"><div class="nt">Namespace</div><div class="nd">list unhealthy pods</div></div>
+        <div class="node"><div class="nt">Namespace</div><div class="nd">list unhealthy pods (live)</div></div>
         <div class="arrow">→</div>
-        <div class="node"><div class="nt">Collect</div><div class="nd">status · events · log tail</div></div>
+        <div class="node hl"><div class="nt">investigate ⇄ tools</div><div class="nd">ReAct: describe · logs</div></div>
         <div class="arrow">→</div>
-        <div class="node hl"><div class="nt">gpt-4o</div><div class="nd">root cause + evidence + fix</div></div>
+        <div class="node hl"><div class="nt">diagnose</div><div class="nd">structured · gpt-4o</div></div>
       </div>
       <div class="flow mt">
         <div class="node"><div class="nt">Propose action</div><div class="nd">restart · scale · delete-pod · manual</div></div>
         <div class="arrow">→</div>
-        <div class="node hl"><div class="nt">Human approves</div><div class="nd">gate · dry-run default</div></div>
+        <div class="node hl"><div class="nt">interrupt()</div><div class="nd">human approves · dry-run default</div></div>
         <div class="arrow">→</div>
-        <div class="node ok"><div class="nt">Remediate</div><div class="nd">allow-list · live only on approval</div></div>
+        <div class="node ok"><div class="nt">remediate</div><div class="nd">allow-list · live only on approval</div></div>
       </div>
-      <div class="callout mt2"><b>Connects to:</b> OpenAI (gpt-4o) · your cluster via the Kubernetes client (kubeconfig,
-        read-only). Runs on a realistic <span class="mono">mock cluster</span> with zero setup, or a real one with
-        <span class="mono">USE_REAL_K8S=true</span> + <span class="mono">rbac.yaml</span>. Launch:
-        <span class="mono">streamlit run app.py</span>.</div>
+      <div class="callout mt2"><b>Built with LangGraph:</b> <span class="mono">StateGraph</span> +
+        <span class="mono">ToolNode</span> + <span class="mono">interrupt()</span> for human-in-the-loop.
+        Connects to OpenAI (gpt-4o) and your cluster (kubeconfig, read-only). Load real failures with
+        <span class="mono">setup-cluster.sh</span>, then <span class="mono">streamlit run app.py</span>.</div>
     </div>
     <footer class="sb"><span><span class="g">◆</span> k8s-troubleshooting-agent</span><span class="c">Process</span><span>03 / 03</span><span class="prog" style="width:100%"></span></footer>
   </section>

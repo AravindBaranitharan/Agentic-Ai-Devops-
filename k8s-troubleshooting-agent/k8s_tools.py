@@ -25,20 +25,35 @@ except ImportError:
 
 
 # --------------------------------------------------------------------------- #
-#  Live-cluster detection
+#  Live-cluster detection  (LIVE-FIRST)
+#
+#  USE_REAL_K8S:  auto (default) → use a real cluster whenever one is reachable,
+#                                  otherwise fall back to the demo mock.
+#                 true           → same, but you intend a real cluster.
+#                 false          → force the mock (offline).
+#  We actually TALK to the API to confirm reachability — no hard-coded assumption.
 # --------------------------------------------------------------------------- #
-def _real_enabled() -> bool:
-    if os.getenv("USE_REAL_K8S", "false").lower() not in ("1", "true", "yes"):
+_LIVE_CACHE = None  # None = unknown, True/False = decided this process
+
+
+def _real_enabled(recheck: bool = False) -> bool:
+    global _LIVE_CACHE
+    mode = os.getenv("USE_REAL_K8S", "auto").lower()
+    if mode in ("0", "false", "no"):
         return False
+    if _LIVE_CACHE is not None and not recheck:
+        return _LIVE_CACHE
     try:
-        from kubernetes import config
+        from kubernetes import config, client
         try:
             config.load_incluster_config()      # running inside a pod
         except Exception:
             config.load_kube_config()           # ~/.kube/config or KUBECONFIG
-        return True
+        client.CoreV1Api().list_namespace(limit=1, _request_timeout=4)  # is it really up?
+        _LIVE_CACHE = True
     except Exception:
-        return False
+        _LIVE_CACHE = False
+    return _LIVE_CACHE
 
 
 def cluster_context() -> str:
