@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>K8s Troubleshooting Agent — Developer Build</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0B1220; --ink2:#131E30; --ink3:#0A121F; --line:#233144; --line2:#31445d;
+  --fg:#EEF2F9; --muted:#9EABC1; --dim:#64728A;
+  --cyan:#38BDF8; --cyan-hi:#7DD3FC; --mint:#5AD69B; --rose:#F0857F; --amber:#F6A83C; --violet:#A78BFA;
+  --disp:'Space Grotesk',system-ui,sans-serif; --sans:'IBM Plex Sans',system-ui,sans-serif; --mono:'IBM Plex Mono',ui-monospace,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{background:#05080f;font-family:var(--sans);color:var(--fg);-webkit-font-smoothing:antialiased;overflow:hidden}
+.deck{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+.stage{position:relative;width:1280px;height:720px;transform-origin:center center}
+.slide{position:absolute;inset:0;background:var(--ink);padding:56px 76px 76px;display:none;flex-direction:column;overflow:hidden}
+.slide.active{display:flex}
+.slide::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(58% 46% at 100% 0%, rgba(56,189,248,.08), transparent 68%);}
+.slide::after{content:"";position:absolute;inset:0 0 auto 0;height:5px;background:var(--cyan)}
+.kicker{font-family:var(--mono);font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--cyan);display:flex;align-items:center;gap:9px;margin-bottom:12px}
+.kicker::before{content:"";width:22px;height:2px;background:var(--cyan)}
+.h1{font-family:var(--disp);font-weight:700;font-size:52px;line-height:1.05;letter-spacing:-.02em;color:#F5F8FC}
+.h2{font-family:var(--disp);font-weight:600;font-size:38px;line-height:1.08;letter-spacing:-.015em;color:#F5F8FC}
+.am{color:var(--cyan)}
+.body{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center}
+.head{margin-bottom:14px}
+.lead{font-size:18px;line-height:1.55;color:var(--muted);max-width:74ch}
+.sub{font-size:16px;line-height:1.55;color:var(--muted);max-width:74ch;margin-top:14px}
+.p b{color:var(--fg);font-weight:600}.em{color:var(--cyan-hi);font-weight:500}
+.h3{font-family:var(--disp);font-weight:600;font-size:16px;color:#F0F4FA;margin-bottom:6px}
+.mono{font-family:var(--mono);color:var(--cyan-hi)}
+.mt{margin-top:14px}.mt2{margin-top:22px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.card{background:var(--ink2);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+.card.hot{border-color:var(--cyan);background:rgba(56,189,248,.07)}
+.card .num{font-family:var(--mono);font-size:12px;color:var(--cyan);margin-bottom:7px}
+.card p{font-size:13.5px;line-height:1.45;color:var(--muted)}
+.card p code,.p code,li code{font-family:var(--mono);font-size:.92em;color:var(--cyan-hi);background:rgba(56,189,248,.08);padding:1px 5px;border-radius:5px}
+.callout{border-left:3px solid var(--cyan);background:var(--ink2);padding:14px 20px;border-radius:0 8px 8px 0;font-size:15.5px;line-height:1.55;color:var(--fg)}
+.list{list-style:none}
+.list li{position:relative;padding-left:24px;margin-bottom:10px;font-size:16px;line-height:1.5;color:var(--muted)}
+.list li::before{content:"▸";position:absolute;left:0;top:0;color:var(--cyan);font-weight:700}
+.flow{display:flex;align-items:stretch;gap:9px;flex-wrap:wrap}
+.node{background:var(--ink2);border:1px solid var(--line);border-radius:10px;padding:12px 14px;flex:1;min-width:0}
+.node.hl{border-color:var(--cyan);background:rgba(56,189,248,.1)}
+.node.ok{border-color:rgba(90,214,155,.5)}
+.node.warn{border-color:rgba(246,168,60,.5)}
+.nt{font-family:var(--disp);font-weight:600;font-size:14px;color:#F0F4FA}
+.nd{font-family:var(--mono);font-size:10.5px;color:var(--muted);margin-top:3px}
+.arrow{display:flex;align-items:center;color:var(--cyan);font-size:18px;font-weight:700}
+.code{background:#070c15;border:1px solid var(--line);border-radius:10px;padding:16px 18px;font-family:var(--mono);font-size:13px;line-height:1.6;color:#CBD5E5;overflow:hidden}
+.code .k{color:var(--violet)} .code .s{color:var(--mint)} .code .c{color:var(--dim)} .code .f{color:var(--cyan-hi)}
+.tbl{width:100%;border-collapse:collapse;font-size:14px}
+.tbl th{text-align:left;font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);padding:8px 12px;border-bottom:1px solid var(--line)}
+.tbl td{padding:9px 12px;border-bottom:1px solid rgba(35,49,68,.55);color:var(--muted);vertical-align:top}
+.tbl td.f{font-family:var(--mono);font-size:12.5px;color:var(--cyan-hi);white-space:nowrap}
+.tag{display:inline-block;font-family:var(--mono);font-size:11px;color:var(--cyan);border:1px solid var(--line2);border-radius:20px;padding:3px 11px;margin:0 6px 6px 0}
+.sb{position:absolute;left:0;right:0;bottom:0;height:42px;display:flex;align-items:center;justify-content:space-between;padding:0 76px;border-top:1px solid var(--line);font-family:var(--mono);font-size:11px;color:var(--dim);letter-spacing:.06em;background:rgba(255,255,255,.014)}
+.sb .g{color:var(--mint)} .sb .c{text-transform:uppercase;letter-spacing:.2em;color:var(--muted)}
+.prog{position:absolute;left:0;bottom:0;height:3px;background:var(--cyan)}
+.hint{position:fixed;left:50%;bottom:12px;transform:translateX(-50%);font-family:var(--mono);font-size:11px;color:var(--dim);transition:opacity .6s;z-index:5}
+.cover{align-items:flex-start;justify-content:center}
+.badge{display:inline-flex;align-self:flex-start;gap:8px;align-items:center;font-family:var(--mono);font-size:12px;color:var(--cyan);border:1px solid var(--line2);border-radius:30px;padding:6px 14px;margin-bottom:22px}
+@media print{
+  @page{size:1280px 720px;margin:0}
+  html,body{overflow:visible;background:#fff;height:auto}
+  .deck{position:static;display:block}.stage{transform:none!important;width:1280px;height:auto}
+  .slide{display:flex!important;position:relative;width:1280px;height:720px;overflow:hidden;page-break-after:always;break-after:page;break-inside:avoid}
+  .slide:last-of-type{page-break-after:auto}.hint{display:none}
+}
+</style>
+</head>
+<body>
+<div class="deck"><div class="stage">
+
+  <!-- 1 · COVER -->
+  <section class="slide active cover">
+    <div class="body">
+      <div class="badge">◆ DEVELOPER BUILD · SHIP</div>
+      <h1 class="h1">Kubernetes Troubleshooting Agent<br><span class="am">what we're going to build</span></h1>
+      <p class="lead mt2">A LangGraph agent that investigates broken pods on a <b>real cluster</b>, diagnoses the
+        root cause with gpt-4o, and proposes a fix behind a <b>human-approval gate</b>. This deck is the
+        engineering plan — architecture, the graph, the tools, and how we run it.</p>
+      <div class="mt2">
+        <span class="tag">LangGraph</span><span class="tag">LangChain tools</span><span class="tag">gpt-4o</span>
+        <span class="tag">kubernetes client</span><span class="tag">Streamlit</span><span class="tag">kind</span>
+      </div>
+    </div>
+    <footer class="sb"><span><span class="g">◆</span> k8s-troubleshooting-agent</span><span class="c">Developer build</span><span>01 / 06</span><span class="prog" style="width:16.6%"></span></footer>
+  </section>
+
+  <!-- 2 · WHAT WE BUILD -->
+  <section class="slide">
+    <div class="head"><div class="kicker">02 · Scope</div>
+      <h2 class="h2">What <span class="am">we</span>, the developers, are building</h2></div>
+    <div class="body">
+      <div class="grid2">
+        <div class="card"><div class="num">READ (auto)</div><div class="h3">Live cluster access</div>
+          <p>A read-only layer over the Kubernetes API — list unhealthy pods, describe them, tail logs. Live-first: it uses a real cluster whenever one is reachable.</p></div>
+        <div class="card"><div class="num">REASON</div><div class="h3">A LangGraph agent</div>
+          <p>A state machine that investigates in a ReAct loop, then emits a <b>structured</b> diagnosis (failure class · root cause · evidence · fix · action).</p></div>
+        <div class="card hot"><div class="num">GATE</div><div class="h3">Human-in-the-loop</div>
+          <p>The graph <b>pauses</b> at <code>interrupt()</code> for approval before any change. Dry-run by default.</p></div>
+        <div class="card"><div class="num">ACT (guarded)</div><div class="h3">Remediation allow-list</div>
+          <p>One tiny, safe set of actions: <code>rollout restart</code> · <code>scale</code> · <code>delete pod</code>. No arbitrary kubectl.</p></div>
+      </div>
+      <div class="callout mt2"><b>Design rule:</b> the LLM only reads and reasons. Exactly one module can mutate the
+        cluster, and only after a human clicks approve. Everything else is read-only.</div>
+    </div>
+    <footer class="sb"><span><span class="g">◆</span> k8s-troubleshooting-agent</span><span class="c">Scope</span><span>02 / 06</span><span class="prog" style="width:33.3%"></span></footer>
+  </section>
+
+  <!-- 3 · ARCHITECTURE -->
+  <section class="slide">
+    <div class="head"><div class="kicker">03 · Architecture</div>
+      <h2 class="h2">How the pieces <span class="am">fit together</span></h2></div>
+    <div class="body">
+      <div class="flow">
+        <div class="node"><div class="nt">Streamlit UI</div><div class="nd">app.py · pick pod</div></div>
+        <div class="arrow">→</div>
+        <div class="node hl"><div class="nt">LangGraph</div><div class="nd">agent_graph.py</div></div>
+        <div class="arrow">→</div>
+        <div class="node"><div class="nt">LangChain tools</div><div class="nd">tools.py</div></div>
+        <div class="arrow">→</div>
+        <div class="node"><div class="nt">k8s client</div><div class="nd">k8s_tools.py</div></div>
+        <div class="arrow">→</div>
+        <div class="node ok"><div class="nt">Cluster</div><div class="nd">kind / EKS · read-only</div></div>
+      </div>
+      <div class="flow mt2">
+        <div class="node hl"><div class="nt">gpt-4o</div><div class="nd">reasoning + structured output</div></div>
+        <div class="arrow">↕</div>
+        <div class="node"><div class="nt">LangGraph node · diagnose</div><div class="nd">with_structured_output(Diagnosis)</div></div>
+        <div class="arrow">→</div>
+        <div class="node warn"><div class="nt">interrupt()</div><div class="nd">human approves</div></div>
+        <div class="arrow">→</div>
+        <div class="node ok"><div class="nt">remediation.py</div><div class="nd">guarded allow-list</div></div>
+      </div>
+      <div class="callout mt2"><b>Data flow:</b> UI → graph → tools read the cluster → gpt-4o diagnoses → graph pauses
+        for approval → the guarded module applies exactly one action. State lives in a <code>MemorySaver</code> checkpointer.</div>
+    </div>
+    <footer class="sb"><span><span class="g">◆</span> k8s-troubleshooting-agent</span><span class="c">Architecture</span><span>03 / 06</span><span class="prog" style="width:50%"></span></footer>
+  </section>
+
+  <!-- 4 · THE GRAPH -->
+  <section class="slide">
+    <div class="head"><div class="kicker">04 · The LangGraph</div>
+      <h2 class="h2">The agent is a <span class="am">state machine</span></h2></div>
+    <div class="body">
+      <div class="grid2" style="grid-template-columns:1.15fr .85fr;gap:22px;align-items:center">
+        <div class="code">
+<span class="c"># agent_graph.py — nodes &amp; edges</span><br>
+g = <span class="f">StateGraph</span>(State)<br>
+g.add_node(<span class="s">"investigate"</span>, investigate) <span class="c"># LLM + tools</span><br>
+g.add_node(<span class="s">"tools"</span>, <span class="f">ToolNode</span>(TOOLS))<br>
+g.add_node(<span class="s">"diagnose"</span>, diagnose) <span class="c"># structured</span><br>
+g.add_node(<span class="s">"approval_gate"</span>, approval_gate)<br>
+g.add_node(<span class="s">"remediate"</span>, remediate)<br><br>
+g.add_conditional_edges(<span class="s">"investigate"</span>,<br>
+&nbsp;&nbsp;<span class="f">tools_condition</span>, {<span class="s">"tools"</span>:<span class="s">"tools"</span>, END:<span class="s">"diagnose"</span>})<br>
+g.add_edge(<span class="s">"tools"</span>, <span class="s">"investigate"</span>) <span class="c"># ReAct loop</span><br>
+g.add_conditional_edges(<span class="s">"diagnose"</span>, after_diagnose)<br>
+g.<span class="f">compile</span>(checkpointer=<span class="f">MemorySaver</span>())
+        </div>
+        <div>
+          <ul class="list">
+            <li><b>investigate ⇄ tools</b> — the agent decides which read tools to call, and loops until it has evidence.</li>
+            <li><b>diagnose</b> — one structured LLM call → a typed <code>Diagnosis</code> (Pydantic).</li>
+            <li><b>after_diagnose</b> — if the fix is <code>manual</code>, stop; else go to the gate.</li>
+            <li><b>approval_gate</b> — <code>interrupt()</code> pauses the graph; the UI resumes with <code>Command(resume=…)</code>.</li>
+            <li><b>remediate</b> — runs the one approved action, dry-run unless <em class="em">execute</em> is on.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <footer class="sb"><span><span class="g">◆</span> k8s-troubleshooting-agent</span><span class="c">The graph</span><span>04 / 06</span><span class="prog" style="width:66.6%"></span></footer>
+  </section>
+
+  <!-- 5 · FILES + LIVE CASES -->
+  <section class="slide">
+    <div class="head"><div class="kicker">05 · Codebase &amp; test data</div>
+      <h2 class="h2">The files we write — and <span class="am">real</span> failures to test on</h2></div>
+    <div class="body">
+      <div class="grid2" style="gap:26px">
+        <table class="tbl">
+          <tr><th>file</th><th>responsibility</th></tr>
+          <tr><td class="f">agent_graph.py</td><td>the LangGraph orchestration</td></tr>
+          <tr><td class="f">tools.py</td><td>read-only LangChain tools</td></tr>
+          <tr><td class="f">k8s_tools.py</td><td>live cluster access + mock fallback</td></tr>
+          <tr><td class="f">remediation.py</td><td>guarded write allow-list</td></tr>
+          <tr><td class="f">app.py</td><td>Streamlit UI drives the graph</td></tr>
+          <tr><td class="f">rbac.yaml</td><td>least-privilege access</td></tr>
+        </table>
+        <div>
+          <div class="h3">Live cases we deploy to break on purpose</div>
+          <p class="sub" style="margin-top:6px">Real workloads in <code>live-cases/live-cases.yaml</code> — the agent reads them live, nothing is canned.</p>
+          <ul class="list mt">
+            <li><b>CrashLoopBackOff</b> — app exits, <code>DATABASE_URL</code> unset</li>
+            <li><b>ImagePullBackOff</b> — image tag doesn't exist</li>
+            <li><b>OOMKilled</b> — 250M alloc vs a 150Mi limit</li>
+            <li><b>Pending</b> — requests 64 CPUs, unschedulable</li>
+            <li><b>CreateContainerConfigError</b> — missing Secret</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <footer class="sb"><span><span class="g">◆</span> k8s-troubleshooting-agent</span><span class="c">Codebase</span><span>05 / 06</span><span class="prog" style="width:83.3%"></span></footer>
+  </section>
+
+  <!-- 6 · BUILD PLAN / RUN -->
+  <section class="slide">
+    <div class="head"><div class="kicker">06 · How we build &amp; run it</div>
+      <h2 class="h2">The <span class="am">build plan</span>, step by step</h2></div>
+    <div class="body">
+      <div class="grid4">
+        <div class="card"><div class="num">STEP 1</div><div class="h3">Cluster + cases</div><p><code>setup-cluster.sh</code> → a real <code>kind</code> cluster with the live failures applied.</p></div>
+        <div class="card"><div class="num">STEP 2</div><div class="h3">Read layer</div><p>Wrap the k8s client in read-only tools; auto-detect live vs mock.</p></div>
+        <div class="card"><div class="num">STEP 3</div><div class="h3">The graph</div><p>Investigate ⇄ tools → diagnose → gate → remediate, with a checkpointer.</p></div>
+        <div class="card hot"><div class="num">STEP 4</div><div class="h3">UI + gate</div><p>Streamlit drives the graph; approval resumes it via <code>Command</code>.</p></div>
+      </div>
+      <div class="code mt2">
+<span class="c"># run the whole thing</span><br>
+pip install -r requirements.txt &nbsp;&amp;&amp;&nbsp; cp env.sample .env <span class="c"># add OPENAI_API_KEY</span><br>
+./live-cases/setup-cluster.sh &nbsp;&nbsp;<span class="c"># real cluster + broken pods</span><br>
+streamlit run app.py &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="c"># agent auto-detects the live cluster</span>
+      </div>
+      <div class="callout mt2"><b>Definition of done:</b> pick a real broken pod → the agent investigates live, names the root
+        cause with evidence, proposes a fix → a human approves → the guarded action runs on the cluster.</div>
+    </div>
+    <footer class="sb"><span><span class="g">◆</span> k8s-troubleshooting-agent</span><span class="c">Build plan</span><span>06 / 06</span><span class="prog" style="width:100%"></span></footer>
+  </section>
+
+</div></div>
+<div class="hint">← → or Space · F fullscreen · P to print / save PDF</div>
+<script>
+(function(){
+  const stage=document.querySelector('.stage'), slides=[...document.querySelectorAll('.slide')]; let i=0;
+  function fit(){stage.style.transform='scale('+Math.min(innerWidth/1280,innerHeight/720)+')';}
+  function show(n){i=Math.max(0,Math.min(slides.length-1,n));slides.forEach((s,k)=>s.classList.toggle('active',k===i));location.hash=i+1;}
+  addEventListener('keydown',e=>{if(['ArrowRight','ArrowDown',' ','PageDown'].includes(e.key)){e.preventDefault();show(i+1);}else if(['ArrowLeft','ArrowUp','PageUp'].includes(e.key)){e.preventDefault();show(i-1);}else if(e.key==='Home')show(0);else if(e.key==='End')show(slides.length-1);else if(e.key.toLowerCase()==='f'){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();}});
+  document.querySelector('.deck').addEventListener('click',e=>{if(e.target.closest('a'))return;(e.clientX<innerWidth*0.28)?show(i-1):show(i+1);});
+  addEventListener('resize',fit);addEventListener('hashchange',()=>{const n=parseInt(location.hash.slice(1),10);if(!isNaN(n)&&n-1!==i)show(n-1);});
+  const h=document.querySelector('.hint');if(h)setTimeout(()=>h.style.opacity='0',4200);
+  fit();const s=parseInt(location.hash.slice(1),10);show(!isNaN(s)?s-1:0);
+})();
+</script>
+</body>
+</html>
