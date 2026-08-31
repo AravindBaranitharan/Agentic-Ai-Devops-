@@ -1,0 +1,69 @@
+# Least-privilege RBAC for the Kubernetes Troubleshooting Agent.
+#
+# Two roles, so you grant exactly what the demo needs:
+#   • agent-readonly  — everything the DIAGNOSIS path uses (get/list pods, events, logs).
+#     This is all you need to run the agent as a pure troubleshooter.
+#   • agent-remediate — the extra verbs the (human-gated) REMEDIATION path uses.
+#     Bind this ONLY if you want the "Approve & remediate" button to act for real.
+#
+# Apply:  kubectl apply -f rbac.yaml
+# Then point the app at this ServiceAccount (or use your own kubeconfig).
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: k8s-troubleshooter
+  namespace: default
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: agent-readonly
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "pods/log", "events", "namespaces", "nodes"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["apps"]
+    resources: ["deployments", "replicasets"]
+    verbs: ["get", "list", "watch"]
+---
+# OPTIONAL — the write verbs the remediation allow-list needs. Bind only if you
+# want automated (human-approved) restart / scale / delete-pod to run for real.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: agent-remediate
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["delete"]
+  - apiGroups: ["apps"]
+    resources: ["deployments", "deployments/scale"]
+    verbs: ["get", "patch", "update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: k8s-troubleshooter-readonly
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: agent-readonly
+subjects:
+  - kind: ServiceAccount
+    name: k8s-troubleshooter
+    namespace: default
+# ---
+# Uncomment to enable real remediation:
+# apiVersion: rbac.authorization.k8s.io/v1
+# kind: ClusterRoleBinding
+# metadata:
+#   name: k8s-troubleshooter-remediate
+# roleRef:
+#   apiGroup: rbac.authorization.k8s.io
+#   kind: ClusterRole
+#   name: agent-remediate
+# subjects:
+#   - kind: ServiceAccount
+#     name: k8s-troubleshooter
+#     namespace: default

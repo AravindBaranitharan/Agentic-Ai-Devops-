@@ -1,0 +1,7 @@
+# Kubernetes Troubleshooting Agent — dependencies
+streamlit==1.60.0      # UI (pin: 1.61 + starlette 1.4 broke gzip)
+starlette<1.4          # keep gzip compatible with streamlit 1.60
+openai>=1.30           # gpt-4o (root-cause diagnosis)
+python-dotenv>=1.0     # loads keys from .env
+pandas>=2.0            # the pod table
+kubernetes>=29.0       # read a REAL cluster (optional — mock works without a cluster)

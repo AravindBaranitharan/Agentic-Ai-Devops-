@@ -20,6 +20,7 @@ pushed as the course progresses.
 | Chat-FinOps Agent | [`chat-finops-agent/`](chat-finops-agent/) | An AI **FinOps** agent: analyze AWS cost, explain month-over-month changes, and surface waste (idle EC2, unused EBS/EIP, old snapshots, stale S3) with **$/mo savings** — a Streamlit dashboard + a **LangChain** (gpt-4o) chat. Read-only; hybrid live/mock. |
 | LangChain & LangGraph demo | [`langchain-langgraph-demo/`](langchain-langgraph-demo/) | Teaching material for two sessions: runnable **LangChain** (LCEL, tools/agent, structured output) and **LangGraph** (state graph, agent loop, human-in-the-loop) examples, plus two interactive decks (What-is-LangChain / What-is-LangGraph, PDF) and a comparison. |
 | IaC Generator Agent | [`iac-generator-agent/`](iac-generator-agent/) | Natural language → reviewed **Terraform**: gpt-4o generates secure HCL, runs a real `terraform plan`, explains the diff, checks policy, and gates `apply` behind human approval. Streamlit app + 3-slide deck (PDF). |
+| K8s Troubleshooting Agent | [`k8s-troubleshooting-agent/`](k8s-troubleshooting-agent/) | Finds broken **Kubernetes** pods, reads their status + events + logs, and gpt-4o explains the **root cause** (CrashLoopBackOff, OOMKilled, ImagePullBackOff, Unschedulable…) with a proposed fix — remediation (restart/scale/delete-pod) is a safe allow-list behind **human approval**. Read-only; real cluster or built-in mock. Streamlit app + 3-slide deck (PDF). |
 
 ## How every lab works
 
