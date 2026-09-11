@@ -1,0 +1,23 @@
+# Real CI workflow — a dependency-resolution failure. It FAILS for real because it
+# pins a package version that does not exist on PyPI, so pip's resolver errors out.
+# A different root cause for the triage agent to diagnose.
+#
+# Install: copy to  .github/workflows/ci-dependencies.yml  at the repo root.
+name: CI · dependency check
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  install-deps:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install a pinned dependency
+        # requests 99.99.99 does not exist → real "Could not find a version" resolver error
+        run: pip install "requests==99.99.99"
