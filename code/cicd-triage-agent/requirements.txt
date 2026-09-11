@@ -1,0 +1,10 @@
+# CI/CD Build-Failure Triage Agent — dependencies
+streamlit==1.60.0        # UI (pin: 1.61 + starlette 1.4 broke gzip)
+starlette<1.4            # keep gzip compatible with streamlit 1.60
+langgraph>=1.0           # the agent orchestration (state graph + human-in-the-loop)
+langchain>=1.0           # tools + message plumbing
+langchain-openai>=0.3    # gpt-4o chat model
+requests>=2.31           # GitHub REST API (runs, jobs, logs, comments)
+python-dotenv>=1.0       # loads keys from .env
+pandas>=2.0              # the runs table
+# GitHub auth: GITHUB_TOKEN in .env, or the `gh` CLI (brew install gh; gh auth login)

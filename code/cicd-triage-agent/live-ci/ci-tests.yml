@@ -1,0 +1,27 @@
+# Real CI workflow — builds & tests the sample project. It FAILS for real because
+# calculator.add() has a bug (test_add expects 5, gets -1). The triage agent reads
+# this run's real logs and diagnoses it.
+#
+# Install: copy to  .github/workflows/ci-tests.yml  at the repo root.
+name: CI · sample tests
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: code/cicd-triage-agent/sample-project
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Run unit tests
+        run: pytest -v

@@ -21,6 +21,7 @@ pushed as the course progresses.
 | LangChain & LangGraph demo | [`langchain-langgraph-demo/`](langchain-langgraph-demo/) | Teaching material for two sessions: runnable **LangChain** (LCEL, tools/agent, structured output) and **LangGraph** (state graph, agent loop, human-in-the-loop) examples, plus two interactive decks (What-is-LangChain / What-is-LangGraph, PDF) and a comparison. |
 | IaC Generator Agent | [`iac-generator-agent/`](iac-generator-agent/) | Natural language → reviewed **Terraform**: gpt-4o generates secure HCL, runs a real `terraform plan`, explains the diff, checks policy, and gates `apply` behind human approval. Streamlit app + 3-slide deck (PDF). |
 | K8s Troubleshooting Agent | [`k8s-troubleshooting-agent/`](k8s-troubleshooting-agent/) | Finds broken **Kubernetes** pods, reads their status + events + logs, and gpt-4o explains the **root cause** (CrashLoopBackOff, OOMKilled, ImagePullBackOff, Unschedulable…) with a proposed fix — remediation (restart/scale/delete-pod) is a safe allow-list behind **human approval**. Read-only; real cluster or built-in mock. Streamlit app + 3-slide deck (PDF). |
+| CI/CD Build-Failure Triage Agent | [`cicd-triage-agent/`](cicd-triage-agent/) | A **LangGraph** agent that triages **real** failed **GitHub Actions** builds: reads the failed run's jobs + real logs, diagnoses the root cause with gpt-4o (test/dependency/compile/flaky), and posts a triage comment on the commit behind a **human approval**. Production-standard, no mock. Streamlit + 3-slide deck (PDF). |
 
 ## How every lab works
 
